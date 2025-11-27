@@ -122,14 +122,15 @@ CREATE OR ALTER PROCEDURE usp_CreateExpense
     @CategoryId INT,
     @AmountMinor INT,
     @ExpenseDate DATE,
-    @Description NVARCHAR(1000) = NULL
+    @Description NVARCHAR(1000) = NULL,
+    @Currency NVARCHAR(3) = 'GBP'
 AS
 BEGIN
     DECLARE @DraftStatusId INT;
     SELECT @DraftStatusId = StatusId FROM dbo.ExpenseStatus WHERE StatusName = 'Draft';
 
     INSERT INTO dbo.Expenses (UserId, CategoryId, StatusId, AmountMinor, Currency, ExpenseDate, Description, CreatedAt)
-    VALUES (@UserId, @CategoryId, @DraftStatusId, @AmountMinor, 'GBP', @ExpenseDate, @Description, SYSUTCDATETIME());
+    VALUES (@UserId, @CategoryId, @DraftStatusId, @AmountMinor, @Currency, @ExpenseDate, @Description, SYSUTCDATETIME());
 
     SELECT SCOPE_IDENTITY() AS ExpenseId;
 END

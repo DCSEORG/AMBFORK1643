@@ -139,6 +139,7 @@ public class ExpenseService : IExpenseService
             command.Parameters.AddWithValue("@AmountMinor", (int)(request.Amount * 100));
             command.Parameters.AddWithValue("@ExpenseDate", request.ExpenseDate);
             command.Parameters.AddWithValue("@Description", request.Description ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Currency", request.Currency ?? "GBP");
 
             var result = await command.ExecuteScalarAsync();
             return Convert.ToInt32(result);
