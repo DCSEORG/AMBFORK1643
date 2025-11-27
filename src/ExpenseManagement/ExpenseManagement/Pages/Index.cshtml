@@ -1,0 +1,175 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Expense Management System";
+}
+
+<div class="expense-app">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger error-banner" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Error:</strong> @Model.ErrorMessage
+        </div>
+    }
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Expenses List Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-list-ul"></i> Expenses</h4>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" name="filter" value="@Model.Filter" class="form-control" placeholder="Search expenses..." />
+                            </div>
+                            <div class="col-md-3">
+                                <select name="categoryFilter" class="form-select">
+                                    <option value="">All Categories</option>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        <option value="@cat.CategoryId" selected="@(Model.CategoryFilter == cat.CategoryId)">@cat.CategoryName</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="statusFilter" class="form-select">
+                                    <option value="">All Statuses</option>
+                                    @foreach (var status in Model.Statuses)
+                                    {
+                                        <option value="@status.StatusId" selected="@(Model.StatusFilter == status.StatusId)">@status.StatusName</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-outline-primary w-100"><i class="bi bi-search"></i> Filter</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var expense in Model.Expenses)
+                                {
+                                    <tr>
+                                        <td>@expense.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                                        <td><span class="badge bg-secondary">@expense.CategoryName</span></td>
+                                        <td class="fw-bold">£@expense.AmountGBP.ToString("F2")</td>
+                                        <td>
+                                            @{
+                                                var statusClass = expense.StatusName switch
+                                                {
+                                                    "Approved" => "bg-success",
+                                                    "Rejected" => "bg-danger",
+                                                    "Submitted" => "bg-warning text-dark",
+                                                    _ => "bg-info"
+                                                };
+                                            }
+                                            <span class="badge @statusClass">@expense.StatusName</span>
+                                        </td>
+                                        <td class="text-truncate" style="max-width: 200px;">@expense.Description</td>
+                                        <td>
+                                            @if (expense.StatusName == "Draft")
+                                            {
+                                                <form method="post" asp-page-handler="Submit" class="d-inline">
+                                                    <input type="hidden" name="expenseId" value="@expense.ExpenseId" />
+                                                    <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-send"></i></button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Add Expense Form -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add Expense</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Create">
+                        <div class="mb-3">
+                            <label class="form-label">Amount (£)</label>
+                            <input type="number" step="0.01" name="amount" class="form-control" placeholder="0.00" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="expenseDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="categoryId" class="form-select" required>
+                                @foreach (var cat in Model.Categories)
+                                {
+                                    <option value="@cat.CategoryId">@cat.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="Enter expense description..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg"></i> Submit</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="/Approve" class="list-group-item list-group-item-action">
+                        <i class="bi bi-check2-square"></i> Approve Expenses
+                    </a>
+                    <a href="/Chat" class="list-group-item list-group-item-action">
+                        <i class="bi bi-chat-dots"></i> Chat Assistant
+                    </a>
+                    <a href="/swagger" class="list-group-item list-group-item-action">
+                        <i class="bi bi-code-slash"></i> API Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .expense-app {
+            padding: 20px 0;
+        }
+        .error-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

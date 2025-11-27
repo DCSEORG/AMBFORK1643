@@ -1,0 +1,109 @@
+@page
+@model ApproveModel
+@{
+    ViewData["Title"] = "Approve Expenses";
+}
+
+<div class="expense-app">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger error-banner" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Error:</strong> @Model.ErrorMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> @Model.SuccessMessage
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h4 class="mb-0"><i class="bi bi-check2-square"></i> Approve Expenses</h4>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">Pending expenses awaiting approval:</p>
+            
+            <form method="get" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="filter" value="@Model.Filter" class="form-control" placeholder="Filter expenses..." />
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-outline-secondary w-100"><i class="bi bi-search"></i> Filter</button>
+                    </div>
+                </div>
+            </form>
+
+            @if (Model.PendingExpenses.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Employee</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var expense in Model.PendingExpenses)
+                            {
+                                <tr>
+                                    <td>@expense.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                                    <td><span class="badge bg-secondary">@expense.CategoryName</span></td>
+                                    <td class="fw-bold">£@expense.AmountGBP.ToString("F2")</td>
+                                    <td>@expense.UserName</td>
+                                    <td class="text-truncate" style="max-width: 200px;">@expense.Description</td>
+                                    <td>
+                                        <form method="post" class="d-inline">
+                                            <input type="hidden" name="expenseId" value="@expense.ExpenseId" />
+                                            <button type="submit" name="action" value="approve" class="btn btn-sm btn-success">
+                                                <i class="bi bi-check-lg"></i> Approve
+                                            </button>
+                                            <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-x-lg"></i> Reject
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No pending expenses to approve.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="/" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Back to Expenses</a>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .expense-app {
+            padding: 20px 0;
+        }
+        .error-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

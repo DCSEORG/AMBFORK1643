@@ -1,0 +1,54 @@
+# .gitignore for Expense Management System
+
+# .NET build artifacts
+bin/
+obj/
+publish/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# IMPORTANT: Include app.zip for deployment
+# Do NOT add *.zip to this file
+!app.zip
+
+# Node modules (if any)
+node_modules/
+
+# Azure Functions local settings
+local.settings.json
+
+# User secrets
+secrets.json
